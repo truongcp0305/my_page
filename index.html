@@ -24,11 +24,52 @@
   </div>
   <script src="wasm_exec.js"></script>
   <script>
+    const playerScoreEl = document.getElementById('playerScore');
+    const aiScoreEl = document.getElementById('aiScore');
+    const turnEl = document.getElementById('turn');
+    const messageEl = document.getElementById('message');
+    const rollBtn = document.getElementById('rollBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const historyList = document.getElementById('historyList');
+
+    function updateUI(state) {
+      playerScoreEl.textContent = state.playerScore;
+      aiScoreEl.textContent = state.aiScore;
+      turnEl.innerHTML = 'Lượt: <b>' + (state.turn === 'player' ? 'Bạn' : 'Máy') + '</b>';
+      messageEl.textContent = state.message || '';
+      rollBtn.disabled = state.gameOver || state.turn !== 'player';
+      resetBtn.disabled = false;
+      // Lịch sử
+      historyList.innerHTML = '';
+      for (let i = 0; i < state.history.length; i++) {
+        const li = document.createElement('li');
+        li.textContent = state.history[i];
+        historyList.appendChild(li);
+      }
+    }
+
+    function getStateAndUpdate() {
+      const state = window.dice21.getState();
+      updateUI(state);
+    }
+
+    function onRoll() {
+      window.dice21.roll();
+      getStateAndUpdate();
+    }
+
+    function onReset() {
+      window.dice21.reset();
+      getStateAndUpdate();
+    }
+
     const go = new Go();
     WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
       go.run(result.instance);
-      // Go sẽ gắn các hàm vào window.dice21
       window.dice21.init();
+      getStateAndUpdate();
+      rollBtn.onclick = onRoll;
+      resetBtn.onclick = onReset;
     });
   </script>
 </body>
