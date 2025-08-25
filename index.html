@@ -3,18 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>React + TinyGo WASM Example</title>
+  <title>Dice 21 - Go WASM</title>
+  <style>
+    body { font-family: sans-serif; background: #f8f8f8; }
+    #game { max-width: 400px; margin: 40px auto; padding: 24px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+    button { margin: 8px 8px 8px 0; padding: 8px 16px; }
+    #history { text-align: left; margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="game">
+    <h2>🎲 Dice 21 🎲</h2>
+    <div><b>Điểm của bạn:</b> <span id="playerScore">0</span></div>
+    <div><b>Điểm máy:</b> <span id="aiScore">0</span></div>
+    <div id="turn">Lượt: <b>Bạn</b></div>
+    <div id="message" style="color:red;font-weight:bold;margin:8px 0;"></div>
+    <button id="rollBtn">Lắc xúc xắc</button>
+    <button id="resetBtn">Chơi lại</button>
+    <div id="history"><b>Lịch sử:</b><ul id="historyList"></ul></div>
+  </div>
   <script src="wasm_exec.js"></script>
   <script>
     const go = new Go();
     WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
       go.run(result.instance);
-      window.add = window.add || function() { return 'WASM not loaded'; };
+      // Go sẽ gắn các hàm vào window.dice21
+      window.dice21.init();
     });
   </script>
-  <script type="module" src="index-DwOr6onU.js"></script> <!-- React build output -->
 </body>
 </html>
